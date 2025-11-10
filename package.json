@@ -1,0 +1,17 @@
+{
+  "name": "js-revisao",
+  "version": "1.0.0",
+  "description": "Revisão de classes: ingressos, usuários, relógios",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/<SEU_USUARIO>/cinema-classes-js.git"
+  },
+  "license": "MIT",
+  "scripts": {
+    "test": "jest --config=jest.config.cjs"
+  },
+  "devDependencies": {
+    "jest": "^29.6.1"
+  }
+}
