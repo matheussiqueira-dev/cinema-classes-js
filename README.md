@@ -1,29 +1,43 @@
-# Revisão: Classes de Ingressos, Usuários e Relógios
+# cinema-classes-js
 
-Este projeto contém implementações em JavaScript (CommonJS) para:
+Implementações em JavaScript (CommonJS) que modelam conceitos de um cinema: ingressos, usuários e relógios. Projetado para aprendizagem, prototipagem e integração em aplicações de front/back-end.
 
-- `ingressos.js` — classes `Ingresso`, `MeiaEntrada`, `IngressoFamilia`.
-- `usuarios.js` — classes `Usuario`, `Gerente`, `Vendedor`, `Atendente`.
-- `relogios.js` — classes `Relogio`, `RelogioAmericano`, `RelogioBrasileiro`.
-- `index.js` — demo com exemplos de uso.
+Principais arquivos
+- ingressos.js — Ingresso, MeiaEntrada, IngressoFamilia
+- usuarios.js — Usuario, Gerente, Vendedor, Atendente
+- relogios.js — Relogio, RelogioAmericano, RelogioBrasileiro
+- index.js — demonstração simples de uso
+- jest.config.cjs — configuração de testes com Jest
 
-Como rodar localmente (macOS, zsh):
+Resumo das regras implementadas
+- Meia-entrada: paga metade do valor.
+- Ingresso família: valor por pessoa * número de pessoas, com desconto de 5% se pessoas > 3.
+- RelogioAmericano#sincronizarCom converte horas 0–23 para 1–12.
 
-1. Instale Node.js (recomendado via Homebrew):
+Como rodar localmente
+Requisitos
+- Node.js (versão LTS recomendada)
 
-```bash
-brew install node
-```
+Comandos
+- Instalar dependências:
+  npm install
+- Executar testes:
+  npm test
+- Executar demo:
+  node index.js
 
-2. No diretório do projeto, instale dependências e rode testes:
+Observações de segurança e privacidade
+- Não inclua dados pessoais reais nos exemplos ou nos testes. Use dados fictícios ou mocks.
+- Não armazene segredos (chaves, tokens) no repositório — use variáveis de ambiente ou ferramentas de segredos.
+- Consulte SECURITY.md e PRIVACY.md neste repositório para procedimentos de reporte e diretrizes.
 
-```bash
-npm install
-npm test
-```
+Contribuição
+- Abra issues para bugs ou sugestões e envie PRs com descrições claras e testes quando aplicável.
+- Siga o padrão de revisão por pull request; mantenedores farão a triagem e revisão de código.
+- Veja GOVERNANCE.md para papéis, processo de decisão e políticas de manutenção.
 
-Os testes usam Jest (configurado em `jest.config.cjs`). Se preferir não instalar as dependências, você pode executar `node index.js` para ver o demo.
+Licença
+- Consulte o arquivo LICENSE (se presente) para termos de uso.
 
-Observações:
-- Os métodos que retornam valores reais de ingressos seguem as regras solicitadas (meia = metade, família = valor * número de pessoas com 5% de desconto para >3).
-- `RelogioAmericano#sincronizarCom` converte horas 0-23 para 1-12.
+Revisão recente
+- Revisão focada nas classes de Ingressos, Usuários e Relógios; testes cobrem comportamento básico descrito acima.
