@@ -18,7 +18,6 @@ brew install node
 2. No diretório do projeto, instale dependências e rode testes:
 
 ```bash
-cd "/Users/matheussiqueira/Documents/Programação/JS - Revisao"
 npm install
 npm test
 ```
