@@ -1,139 +1,189 @@
-# Cinema Ops Backend
+# Cinema Ops Platform
 
-Backend modular para operação de cinema, com API REST versionada, autenticação JWT, autorização por papéis/permissões, proteção CSRF para operações mutáveis, validação de dados, logging estruturado e testes automatizados.
+Plataforma fullstack para operacao de cinema com foco em **precificacao**, **gestao de sessoes**, **controle de estoque** e **analiticos operacionais**.
 
-## Visão Geral do Backend
+O projeto combina:
+- **Frontend modular** (SPA estatica) para operacao diaria com UX moderna.
+- **Backend REST v1** com seguranca por camadas (JWT, RBAC, CSRF, rate limit, idempotencia).
+- **Dominio reutilizavel** em JavaScript orientado a objetos.
 
-O projeto implementa regras de negócio para:
-- venda de ingressos e gestão de sessões;
-- controle de estoque da bomboniere;
-- precificação dinâmica e simulações;
-- cálculo de folha salarial;
-- indicadores operacionais e métricas de sistema.
+## Visao Geral
 
-A solução foi evoluída para um **modular monolith** com separação de camadas e responsabilidades, mantendo o domínio independente e reutilizável.
+### Objetivo de negocio
+Acelerar a operacao do cinema com previsibilidade comercial e controle operacional centralizado.
 
-## Arquitetura Adotada
+### Publico-alvo
+- Gerentes de unidade
+- Equipe de vendas e atendimento
+- Times tecnicos responsaveis por evolucao da plataforma
+
+### Fluxo principal
+1. Usuario autentica no backend.
+2. Frontend conecta via **Backend Gateway**.
+3. Operacao executa precificacao, vendas e movimentos de estoque.
+4. Dashboard acompanha ocupacao, receita, itens criticos e meta.
+5. Snapshot e relatorios apoiam tomada de decisao.
+
+## Principais Funcionalidades
+
+### Frontend
+- Dashboard operacional com KPIs em tempo real.
+- Modulos de navegação:
+  - `Pricing Lab`
+  - `Session Command`
+  - `Stock Board`
+  - `Time Sync`
+- Importacao/exportacao de workspace em JSON.
+- Integracao com backend (login, sync de snapshot, metricas de sistema).
+- Tokens visuais e design system leve (tipografia, cores, espacos, estados).
+- Responsividade mobile/desktop e foco em acessibilidade (skip link, foco visivel, `aria-*`).
+
+### Backend
+- API REST versionada em `/api/v1`.
+- Login com JWT e autorizacao por papeis/permissoes.
+- CSRF para operacoes mutaveis autenticadas.
+- Idempotencia para evitar duplicidade em `POST/PUT/PATCH/DELETE` com `Idempotency-Key`.
+- Auditoria operacional com eventos paginados.
+- Relatorio operacional em JSON ou CSV.
+- Snapshot operacional para sincronizacao frontend-backend.
+
+## Arquitetura e Decisoes Tecnicas
 
 ### Estilo
+- **Monolito modular** no backend.
+- **Frontend modular por features**.
+- Separacao clara entre dominio, servicos, transporte HTTP e estado de interface.
 
-- **Monólito modular** com camadas de domínio, serviços, middlewares e rotas.
+### Principios aplicados
+- SOLID
+- DRY
+- Clean Architecture (dominio desacoplado de framework HTTP)
+- Fail-fast e tratamento consistente de erros
 
-### Camadas
+### Estrategias de escalabilidade
+- Contrato versionado de API (`v1`).
+- Camadas desacopladas para evolucao incremental.
+- Persistencia in-memory encapsulada para migracao futura para banco relacional/NoSQL.
 
-- `src/domain`: regras de negócio puras (entidades e lógica central)
-- `src/backend/services`: orquestração de casos de uso
-- `src/backend/repositories`: persistência in-memory e bootstrap de dados
-- `src/backend/routes`: contratos HTTP versionados (`/api/v1`)
-- `src/backend/middlewares`: segurança, autenticação, autorização, observabilidade e erro
-- `src/backend/core`: erros padronizados, logger e helpers HTTP
+## Stack e Tecnologias
 
-### Princípios aplicados
-
-- SOLID (responsabilidade única e separação por casos de uso)
-- DRY (reuso de validações e serviços)
-- Clean Architecture (domínio isolado de transporte HTTP)
-- Fail fast + tratamento de exceções orientado a contrato
-
-## Tecnologias Utilizadas
-
+### Core
 - Node.js
+- JavaScript (CommonJS no backend, ESM no frontend)
+
+### Backend
 - Express 5
-- JWT (`jsonwebtoken`)
 - `helmet`, `cors`, `compression`, `express-rate-limit`
-- Jest + Supertest (testes de unidade e integração)
+- `jsonwebtoken`
 
-## Segurança e Confiabilidade
+### Frontend
+- HTML5 + CSS3 + JavaScript modular
+- `serve` para host local da UI
 
-Implementado no backend:
+### Qualidade
+- Jest
+- Supertest
+- GitHub Actions (CI)
 
-- **Autenticação**: login com JWT (`Bearer`)
-- **Autorização**: RBAC + permissões por cargo
-- **CSRF**: token CSRF obrigatório para `POST/PUT/PATCH/DELETE` autenticados
-- **Validação de entrada**: validações numéricas, texto, e-mail e limites
-- **Sanitização anti-XSS**: sanitização de payload textual antes de processamento
-- **Rate limiting**: proteção contra abuso de requisições
-- **Hardening HTTP**: headers de segurança via `helmet`
-- **Error handling padronizado**: respostas de erro consistentes com `code`, `message`, `requestId`
-- **Observabilidade**: logging estruturado por request (`requestId`, status, latência, usuário)
+## Seguranca
 
-Observação: como a persistência atual é in-memory, risco de SQL Injection é mitigado por ausência de queries SQL. Em evolução para banco, o padrão recomendado é prepared statements/query builders.
+Implementacoes principais:
+- Autenticacao por JWT (`Authorization: Bearer <token>`)
+- RBAC com permissoes por cargo
+- CSRF (`X-CSRF-Token`) para operacoes mutaveis
+- Rate limiting global
+- Sanitizacao de payload textual
+- Idempotencia para requests mutaveis
+- Headers de seguranca via `helmet`
+- Logging estruturado e padronizacao de erros com `requestId`
 
-## API REST e Contratos
+## Novas Features Implementadas
 
-Prefixo versionado:
+1. **Backend Gateway no frontend**
+- Login direto da UI para API.
+- Sincronizacao de snapshot operacional e metricas do backend.
+- Sessao backend em runtime (tokens nao persistidos em `localStorage`).
 
-- `/api/v1`
+2. **Idempotencia de requests mutaveis**
+- Middleware dedicado com TTL configuravel (`IDEMPOTENCY_TTL_MS`).
+- Reaproveitamento de resposta para chamadas duplicadas.
 
-### Públicos
+3. **Auditoria operacional avancada**
+- Endpoint paginado e filtravel por tipo: `/analytics/audit-events`.
+- Registro enriquecido de eventos (ex.: login, venda, estoque).
 
-- `GET /api/v1/health/live`
-- `GET /api/v1/health/ready`
-- `GET /api/v1/docs`
-- `GET /api/v1/docs/openapi`
-- `POST /api/v1/auth/login`
-- `POST /api/v1/pricing/calculate`
-- `POST /api/v1/pricing/suggest`
-- `POST /api/v1/pricing/grid`
+4. **Relatorio operacional exportavel**
+- Endpoint `/analytics/report` com `format=json|csv`.
+- CSV pronto para consumo externo.
 
-### Autenticados
+5. **Snapshot para sincronizacao fullstack**
+- Endpoint `/analytics/workspace-snapshot`.
+- Hidrata estado de sessao/estoque na UI.
 
-- `GET /api/v1/users/me`
-- `GET /api/v1/users` (gerente)
-- `GET /api/v1/sessions`
-- `POST /api/v1/sessions` (gerente)
-- `GET /api/v1/sessions/:sessionId`
-- `POST /api/v1/sessions/:sessionId/sales` (permissão `vendas:realizar`)
-- `DELETE /api/v1/sessions/:sessionId/sales/:saleId` (gerente)
-- `GET /api/v1/inventory/items`
-- `GET /api/v1/inventory/items/critical`
-- `POST /api/v1/inventory/items` (gerente/atendente)
-- `PATCH /api/v1/inventory/items/:sku/movement` (gerente/atendente)
-- `POST /api/v1/payroll/employee` (gerente)
-- `POST /api/v1/payroll/team` (gerente)
-- `GET /api/v1/analytics/dashboard` (gerente)
-- `GET /api/v1/analytics/system` (gerente)
+## API e Documentacao
 
-## Setup e Execução
+- Prefixo: `http://localhost:3333/api/v1`
+- OpenAPI: `docs/openapi.v1.json`
+- Endpoint de docs:
+  - `GET /api/v1/docs`
+  - `GET /api/v1/docs/openapi`
 
-### Pré-requisitos
+## Setup e Execucao
 
+### Pre-requisitos
 - Node.js LTS
 - npm
 
-### Instalação
-
+### Instalacao
 ```bash
 npm install
 ```
 
-### Executar API
-
+### Rodar backend
 ```bash
 npm run api
 ```
+Backend disponivel em `http://localhost:3333/api/v1`.
 
-API disponível em:
+### Rodar frontend
+```bash
+npm run ui
+```
+Frontend disponivel em `http://localhost:4173`.
 
-- `http://localhost:3333/api/v1`
-
-### Executar testes
-
+### Rodar testes
 ```bash
 npm test
 ```
 
-### Demo de domínio (opcional)
-
+### Rodar demo de dominio (opcional)
 ```bash
 npm run demo
 ```
 
-### UI estática (opcional)
+## Credenciais de Desenvolvimento
 
-```bash
-npm run ui
-```
+Usuarios semeados no bootstrap:
+- `gerente@cinema.com` / `gerente123`
+- `vendedor@cinema.com` / `vendedor123`
+- `atendente@cinema.com` / `atendente123`
+
+## Variaveis de Ambiente
+
+| Variavel | Default | Descricao |
+| --- | --- | --- |
+| `NODE_ENV` | `development` | Ambiente de execucao |
+| `PORT` | `3333` | Porta do backend |
+| `API_PREFIX` | `/api/v1` | Prefixo da API |
+| `JWT_SECRET` | `dev-change-this-secret` | Segredo de assinatura JWT |
+| `JWT_TTL` | `2h` | Expiracao do token |
+| `JWT_ISSUER` | `cinema-ops-backend` | Emissor JWT |
+| `JWT_AUDIENCE` | `cinema-ops-clients` | Audiencia JWT |
+| `CORS_ORIGIN` | `*` | Origem CORS permitida |
+| `RATE_LIMIT_WINDOW_MS` | `900000` | Janela do rate limit |
+| `RATE_LIMIT_MAX` | `200` | Maximo de requests por janela |
+| `JSON_LIMIT` | `120kb` | Limite do body JSON |
+| `IDEMPOTENCY_TTL_MS` | `600000` | TTL para cache de idempotencia |
 
 ## Estrutura do Projeto
 
@@ -144,13 +194,13 @@ npm run ui
 │   │   └── validators.js
 │   ├── domain/
 │   │   ├── ingressos.js
-│   │   ├── usuarios.js
-│   │   ├── relogios.js
 │   │   ├── sessoes.js
 │   │   ├── estoque.js
 │   │   ├── precificacao.js
 │   │   ├── salarios.js
-│   │   └── desempenho.js
+│   │   ├── desempenho.js
+│   │   ├── usuarios.js
+│   │   └── relogios.js
 │   └── backend/
 │       ├── app.js
 │       ├── server.js
@@ -164,58 +214,84 @@ npm run ui
 │       ├── middlewares/
 │       │   ├── auth.js
 │       │   ├── errorHandler.js
+│       │   ├── idempotency.js
 │       │   ├── requestContext.js
 │       │   └── security.js
 │       ├── repositories/
 │       │   └── inMemoryDatabase.js
 │       ├── routes/
 │       │   └── v1/
-│       │       ├── index.js
-│       │       ├── authRoutes.js
-│       │       ├── healthRoutes.js
-│       │       ├── usersRoutes.js
-│       │       ├── sessionsRoutes.js
-│       │       ├── inventoryRoutes.js
-│       │       ├── pricingRoutes.js
-│       │       ├── payrollRoutes.js
 │       │       ├── analyticsRoutes.js
-│       │       └── docsRoutes.js
+│       │       ├── authRoutes.js
+│       │       ├── docsRoutes.js
+│       │       ├── healthRoutes.js
+│       │       ├── inventoryRoutes.js
+│       │       ├── payrollRoutes.js
+│       │       ├── pricingRoutes.js
+│       │       ├── sessionsRoutes.js
+│       │       ├── usersRoutes.js
+│       │       └── index.js
 │       ├── services/
+│       │   ├── analyticsService.js
 │       │   ├── authService.js
-│       │   ├── sessionService.js
 │       │   ├── inventoryService.js
-│       │   ├── pricingService.js
 │       │   ├── payrollService.js
-│       │   └── analyticsService.js
+│       │   ├── pricingService.js
+│       │   └── sessionService.js
 │       └── utils/
 │           └── sanitize.js
+├── ui/
+│   ├── index.html
+│   ├── styles.css
+│   ├── app.js
+│   └── js/
+│       ├── core/
+│       │   ├── apiClient.js
+│       │   ├── fileTransfer.js
+│       │   ├── format.js
+│       │   ├── helpers.js
+│       │   ├── storage.js
+│       │   └── toast.js
+│       ├── domain/
+│       │   └── pricingEngine.js
+│       ├── features/
+│       │   ├── backendIntegration.js
+│       │   ├── clockView.js
+│       │   ├── dashboard.js
+│       │   ├── navigation.js
+│       │   ├── pricingView.js
+│       │   ├── sessionView.js
+│       │   ├── stockView.js
+│       │   └── workspaceActions.js
+│       └── state/
+│           └── store.js
 ├── docs/
 │   └── openapi.v1.json
 ├── __tests__/
 │   ├── api.test.js
-│   └── ...
+│   └── *.test.js
 └── package.json
 ```
 
-## Boas Práticas e Padrões
+## Boas Praticas Adotadas
 
-- Contratos HTTP estáveis com versionamento (`v1`)
-- Erros de domínio mapeados para HTTP de forma consistente
-- Segurança por camadas (auth, autorização, CSRF, limites, sanitização)
-- Estado de aplicação centralizado no container (injeção explícita de dependências)
-- Serviços focados por contexto de negócio
-- Cobertura de integração da API via Supertest
+- Contratos de API versionados e documentados.
+- Middlewares de seguranca e observabilidade como camada transversal.
+- Dominio com regras explicitas e validacao defensiva.
+- Estado frontend centralizado e previsivel.
+- Persistencia de estado com cuidado de seguranca (sem persistir token).
+- Testes de integracao cobrindo autenticacao, autorizacao e fluxos criticos.
 
 ## Melhorias Futuras
 
-- Persistência real (PostgreSQL/MongoDB) com migrations
-- Refresh token + rotação e revogação de sessões
-- Observabilidade avançada (OpenTelemetry, métricas Prometheus, tracing)
-- Versionamento semântico de contrato OpenAPI com validação automática
-- Filas assíncronas para eventos operacionais (vendas, auditoria, estoque)
-- Cache distribuído (Redis) para leitura de dashboards
+- Persistencia real (PostgreSQL/MongoDB) com migracoes.
+- Refresh token com rotacao e revogacao.
+- Observabilidade completa com OpenTelemetry + tracing.
+- Filas assincronas para eventos de auditoria e integracoes externas.
+- Testes E2E browser (Playwright/Cypress).
+- Pipeline de deploy containerizado (Docker + IaC).
 
-## Licença
+## Licenca
 
 MIT.
 

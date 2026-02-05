@@ -1,5 +1,6 @@
 const express = require('express');
 const { authenticate, requireCsrf } = require('../../middlewares/auth');
+const { idempotencyMiddleware } = require('../../middlewares/idempotency');
 const { analyticsRoutes } = require('./analyticsRoutes');
 const { authRoutes } = require('./authRoutes');
 const { docsRoutes } = require('./docsRoutes');
@@ -19,6 +20,7 @@ v1Routes.use('/pricing', pricingRoutes);
 
 v1Routes.use(authenticate);
 v1Routes.use(requireCsrf);
+v1Routes.use(idempotencyMiddleware);
 
 v1Routes.use('/users', usersRoutes);
 v1Routes.use('/sessions', sessionsRoutes);

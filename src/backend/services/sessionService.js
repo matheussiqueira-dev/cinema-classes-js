@@ -13,6 +13,8 @@ class SessionService {
       ...session.resumoFinanceiro(),
       sala: session.sala,
       horario: session.horario,
+      precoBase: session.precoBase,
+      dublado: session.dublado,
       vendas: session.listarVendas(),
     }));
   }
@@ -48,6 +50,8 @@ class SessionService {
       ...session.resumoFinanceiro(),
       sala: session.sala,
       horario: session.horario,
+      precoBase: session.precoBase,
+      dublado: session.dublado,
       vendas: session.listarVendas(),
     };
   }
@@ -74,13 +78,12 @@ class SessionService {
       }
     }
 
-    this.db.auditEvents.push({
+    this.db.addAuditEvent({
       type: 'SESSION_SALE_CREATED',
       sessionId: session.id,
       saleId: sale.id,
       soldByEmail,
       total: sale.total,
-      occurredAt: new Date().toISOString(),
     });
 
     return {
@@ -97,11 +100,10 @@ class SessionService {
       throw new NotFoundError('Venda nao encontrada para esta sessao');
     }
 
-    this.db.auditEvents.push({
+    this.db.addAuditEvent({
       type: 'SESSION_SALE_CANCELLED',
       sessionId: session.id,
       saleId,
-      occurredAt: new Date().toISOString(),
     });
 
     return {

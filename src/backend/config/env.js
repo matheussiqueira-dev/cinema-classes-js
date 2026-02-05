@@ -10,6 +10,7 @@ const DEFAULTS = {
   RATE_LIMIT_WINDOW_MS: 15 * 60 * 1000,
   RATE_LIMIT_MAX: 200,
   JSON_LIMIT: '120kb',
+  IDEMPOTENCY_TTL_MS: 10 * 60 * 1000,
 };
 
 function readNumber(name, fallback) {
@@ -35,6 +36,7 @@ function getEnv() {
     rateLimitWindowMs: readNumber('RATE_LIMIT_WINDOW_MS', DEFAULTS.RATE_LIMIT_WINDOW_MS),
     rateLimitMax: readNumber('RATE_LIMIT_MAX', DEFAULTS.RATE_LIMIT_MAX),
     jsonLimit: readString('JSON_LIMIT', DEFAULTS.JSON_LIMIT),
+    idempotencyTtlMs: readNumber('IDEMPOTENCY_TTL_MS', DEFAULTS.IDEMPOTENCY_TTL_MS),
   };
 }
 

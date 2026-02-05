@@ -1,3 +1,4 @@
+const { randomUUID } = require('node:crypto');
 const { Atendente, Gerente, Vendedor } = require('../../domain/usuarios');
 const { ControleDeEstoque } = require('../../domain/estoque');
 
@@ -7,6 +8,7 @@ class InMemoryDatabase {
     this.sessions = new Map();
     this.inventory = new ControleDeEstoque();
     this.auditEvents = [];
+    this.idempotencyRecords = new Map();
   }
 
   bootstrap() {
@@ -55,6 +57,21 @@ class InMemoryDatabase {
     items.forEach((item) => {
       this.inventory.cadastrarItem(item);
     });
+  }
+
+  addAuditEvent(event) {
+    const enriched = {
+      id: randomUUID(),
+      occurredAt: new Date().toISOString(),
+      ...event,
+    };
+    this.auditEvents.push(enriched);
+
+    if (this.auditEvents.length > 5000) {
+      this.auditEvents.splice(0, this.auditEvents.length - 5000);
+    }
+
+    return enriched;
   }
 }
 

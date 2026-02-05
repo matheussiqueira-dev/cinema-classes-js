@@ -54,6 +54,14 @@ class SessaoCinema {
     return this._capacidade;
   }
 
+  get precoBase() {
+    return this._precoBase;
+  }
+
+  get dublado() {
+    return this._dublado;
+  }
+
   get ingressosVendidos() {
     return this._ingressosVendidos;
   }

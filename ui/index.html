@@ -142,6 +142,38 @@
           <p id="kpi-last-sync">Ultima sync: sem dados</p>
         </section>
 
+        <section class="integration-strip" aria-label="Integração com backend">
+          <header class="integration-head">
+            <h3>Backend Gateway</h3>
+            <p>Conecte no backend para sincronizar sessões, estoque e métricas operacionais.</p>
+          </header>
+
+          <form id="backend-auth-form" class="integration-form" novalidate>
+            <label>
+              Base URL da API
+              <input name="baseUrl" type="url" value="http://localhost:3333/api/v1" />
+            </label>
+            <label>
+              E-mail
+              <input name="email" type="email" value="gerente@cinema.com" autocomplete="username" />
+            </label>
+            <label>
+              Senha
+              <input name="password" type="password" value="gerente123" autocomplete="current-password" />
+            </label>
+            <button type="submit" class="btn btn-primary">Conectar</button>
+          </form>
+
+          <div class="integration-actions">
+            <button id="backend-sync" type="button" class="btn btn-ghost">Sincronizar dados</button>
+            <button id="backend-disconnect" type="button" class="btn btn-ghost">Desconectar</button>
+          </div>
+
+          <p id="backend-status" data-state="idle">API desconectada.</p>
+          <p id="backend-sync-info">Sem sincronização com backend.</p>
+          <p id="backend-metrics">Métricas de backend indisponíveis.</p>
+        </section>
+
         <section class="views">
           <article
             class="panel"

@@ -1,3 +1,5 @@
+import { createApiClient } from './js/core/apiClient.js';
+import { initBackendIntegration } from './js/features/backendIntegration.js';
 import { createToast } from './js/core/toast.js';
 import { initClockView } from './js/features/clockView.js';
 import { initDashboard } from './js/features/dashboard.js';
@@ -10,8 +12,10 @@ import { createCinemaStore } from './js/state/store.js';
 
 const store = createCinemaStore();
 const toast = createToast(document.getElementById('toast'));
+const apiClient = createApiClient({ store });
 
 const disposers = [
+  initBackendIntegration({ store, apiClient, toast }),
   initNavigation({ store }),
   initDashboard({ store }),
   initPricingView({ store, toast }),

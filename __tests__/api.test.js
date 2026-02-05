@@ -113,4 +113,77 @@ describe('Backend API v1', () => {
     expect(response.body.data.operacao).toBeDefined();
     expect(response.body.data.estoque).toBeDefined();
   });
+
+  test('analytics workspace snapshot returns integration payload', async () => {
+    const gerente = await login(app, { email: 'gerente@cinema.com', password: 'gerente123' });
+    expect(gerente.status).toBe(200);
+
+    const response = await request(app)
+      .get('/api/v1/analytics/workspace-snapshot')
+      .set('Authorization', `Bearer ${gerente.accessToken}`);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.data.sessions).toBeDefined();
+    expect(response.body.data.inventory).toBeDefined();
+  });
+
+  test('analytics report supports csv format', async () => {
+    const gerente = await login(app, { email: 'gerente@cinema.com', password: 'gerente123' });
+    expect(gerente.status).toBe(200);
+
+    const response = await request(app)
+      .get('/api/v1/analytics/report?format=csv')
+      .set('Authorization', `Bearer ${gerente.accessToken}`);
+
+    expect(response.statusCode).toBe(200);
+    expect(String(response.headers['content-type'])).toContain('text/csv');
+    expect(response.text).toContain('sessionId');
+  });
+
+  test('idempotency key replays mutating request result', async () => {
+    const gerente = await login(app, { email: 'gerente@cinema.com', password: 'gerente123' });
+    expect(gerente.status).toBe(200);
+
+    const payload = {
+      id: 'SESS-IDEMP-1',
+      filme: 'Matrix',
+      sala: 'Sala 5',
+      horario: '22:00',
+      capacidade: 50,
+      precoBase: 32,
+      dublado: false,
+    };
+
+    const first = await request(app)
+      .post('/api/v1/sessions')
+      .set('Authorization', `Bearer ${gerente.accessToken}`)
+      .set('X-CSRF-Token', gerente.csrfToken)
+      .set('Idempotency-Key', 'same-session-creation')
+      .send(payload);
+
+    const second = await request(app)
+      .post('/api/v1/sessions')
+      .set('Authorization', `Bearer ${gerente.accessToken}`)
+      .set('X-CSRF-Token', gerente.csrfToken)
+      .set('Idempotency-Key', 'same-session-creation')
+      .send(payload);
+
+    expect(first.statusCode).toBe(201);
+    expect(second.statusCode).toBe(201);
+    expect(second.headers['x-idempotent-replay']).toBe('true');
+    expect(second.body.data.sessaoId).toBe('SESS-IDEMP-1');
+  });
+
+  test('audit events endpoint returns paginated list', async () => {
+    const gerente = await login(app, { email: 'gerente@cinema.com', password: 'gerente123' });
+    expect(gerente.status).toBe(200);
+
+    const response = await request(app)
+      .get('/api/v1/analytics/audit-events?limit=5&page=1')
+      .set('Authorization', `Bearer ${gerente.accessToken}`);
+
+    expect(response.statusCode).toBe(200);
+    expect(Array.isArray(response.body.data.items)).toBe(true);
+    expect(response.body.data.pagination).toBeDefined();
+  });
 });

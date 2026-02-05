@@ -31,6 +31,14 @@ const DEFAULT_STATE = {
       updatedAt: null,
     },
   },
+  backend: {
+    baseUrl: 'http://localhost:3333/api/v1',
+    session: null,
+    lastSyncAt: null,
+    syncStatus: 'idle',
+    syncError: null,
+    systemMetrics: null,
+  },
 };
 
 export function createCinemaStore() {
@@ -47,7 +55,13 @@ export function createCinemaStore() {
     const draft = deepClone(state);
     mutator(draft);
     state = draft;
-    persistState(state);
+
+    // Security: tokens are runtime-only and should not persist to localStorage.
+    const persistableState = deepClone(state);
+    if (persistableState.backend) {
+      persistableState.backend.session = null;
+    }
+    persistState(persistableState);
     notify();
   };
 
@@ -230,12 +244,113 @@ export function createCinemaStore() {
     importWorkspace(snapshot) {
       update((draft) => {
         const merged = mergeWithDefaults(DEFAULT_STATE, snapshot || {});
+        if (merged.backend) {
+          merged.backend.session = null;
+        }
         Object.assign(draft, merged);
       });
     },
 
     exportWorkspace() {
-      return deepClone(state);
+      const exported = deepClone(state);
+      if (exported.backend) {
+        exported.backend.session = null;
+      }
+      return exported;
+    },
+
+    setBackendBaseUrl(baseUrl) {
+      update((draft) => {
+        draft.backend.baseUrl = safeTrim(baseUrl, 'http://localhost:3333/api/v1');
+      });
+    },
+
+    setBackendSession(sessionPayload) {
+      update((draft) => {
+        draft.backend.session = {
+          accessToken: safeTrim(sessionPayload.accessToken, ''),
+          csrfToken: safeTrim(sessionPayload.csrfToken, ''),
+          tokenType: safeTrim(sessionPayload.tokenType, 'Bearer'),
+          expiresIn: safeTrim(sessionPayload.expiresIn, ''),
+          user: sessionPayload.user || null,
+          connectedAt: new Date().toISOString(),
+        };
+        draft.backend.syncStatus = 'connected';
+        draft.backend.syncError = null;
+      });
+    },
+
+    clearBackendSession() {
+      update((draft) => {
+        draft.backend.session = null;
+        draft.backend.syncStatus = 'idle';
+        draft.backend.syncError = null;
+      });
+    },
+
+    setBackendSystemMetrics(metrics) {
+      update((draft) => {
+        draft.backend.systemMetrics = metrics || null;
+      });
+    },
+
+    setBackendSyncState({ status = 'idle', error = null } = {}) {
+      update((draft) => {
+        draft.backend.syncStatus = status;
+        draft.backend.syncError = error;
+        if (status === 'success') {
+          draft.backend.lastSyncAt = new Date().toISOString();
+        }
+      });
+    },
+
+    hydrateFromBackendSnapshot(snapshot = {}) {
+      update((draft) => {
+        const sessions = Array.isArray(snapshot.sessions) ? snapshot.sessions : [];
+        const highestRevenueSession = sessions
+          .slice()
+          .sort((a, b) => Number(b.receita || 0) - Number(a.receita || 0))[0];
+
+        if (highestRevenueSession) {
+          draft.session.config = {
+            movie: safeTrim(highestRevenueSession.filme, 'Sessao sincronizada'),
+            room: safeTrim(highestRevenueSession.sala, 'Sala principal'),
+            capacity: Math.max(1, parseInteger(highestRevenueSession.capacidade, 1)),
+            basePrice: Math.max(0, parseNumber(highestRevenueSession.precoBase, 0)),
+            dubbed: Boolean(highestRevenueSession.dublado),
+            backendSessionId: safeTrim(
+              highestRevenueSession.sessaoId || highestRevenueSession.id,
+              ''
+            ),
+          };
+
+          draft.session.sales = Array.isArray(highestRevenueSession.vendas)
+            ? highestRevenueSession.vendas.map((sale) => ({
+                id: safeTrim(sale.id, uid('sale')),
+                type: safeTrim(sale.tipo, 'inteira'),
+                seats: Math.max(0, parseInteger(sale.assentosConsumidos, 0)),
+                total: Math.max(0, parseNumber(sale.total, 0)),
+                createdAt: safeTrim(sale.criadoEm, new Date().toISOString()),
+              }))
+            : [];
+        }
+
+        const rawInventoryItems =
+          snapshot.inventory?.items || snapshot.inventory?.itens || snapshot.inventory?.lista || [];
+        if (Array.isArray(rawInventoryItems) && rawInventoryItems.length > 0) {
+          draft.stock.items = rawInventoryItems.map((item) => ({
+            sku: safeTrim(item.sku, '').toUpperCase(),
+            name: safeTrim(item.nome || item.name, 'Item sem nome'),
+            qty: Math.max(0, parseInteger(item.quantidadeAtual || item.qty, 0)),
+            min: Math.max(0, parseInteger(item.estoqueMinimo || item.min, 0)),
+          }));
+          draft.stock.history = [];
+        }
+
+        draft.backend.syncStatus = 'success';
+        draft.backend.syncError = null;
+        draft.backend.lastSyncAt = new Date().toISOString();
+      });
     },
   };
 }

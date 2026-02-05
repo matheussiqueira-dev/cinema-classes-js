@@ -50,10 +50,9 @@ class InventoryService {
         }),
       });
 
-      this.db.auditEvents.push({
+      this.db.addAuditEvent({
         type: 'INVENTORY_ITEM_CREATED',
         sku: created.sku,
-        occurredAt: new Date().toISOString(),
       });
 
       return created;
@@ -78,12 +77,11 @@ class InventoryService {
           ? this.db.inventory.registrarEntrada(sku, quantidade)
           : this.db.inventory.registrarSaida(sku, quantidade);
 
-      this.db.auditEvents.push({
+      this.db.addAuditEvent({
         type: 'INVENTORY_MOVEMENT',
         sku,
         movementType: tipo,
         quantidade,
-        occurredAt: new Date().toISOString(),
       });
 
       return updated;

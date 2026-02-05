@@ -47,6 +47,14 @@ class AuthService {
       issuedAt: Date.now(),
     });
 
+    this.db.addAuditEvent({
+      type: 'AUTH_LOGIN_SUCCESS',
+      email: user.email,
+      role: user.cargo,
+      ip: String(ip || ''),
+      userAgent: String(userAgent || ''),
+    });
+
     return {
       accessToken,
       csrfToken,

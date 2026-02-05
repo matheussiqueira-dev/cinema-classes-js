@@ -111,6 +111,36 @@
           }
         ]
       }
+    },
+    "/analytics/audit-events": {
+      "get": {
+        "summary": "Lista eventos de auditoria",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/analytics/report": {
+      "get": {
+        "summary": "Relatorio operacional (json ou csv)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/analytics/workspace-snapshot": {
+      "get": {
+        "summary": "Snapshot operacional para sincronizacao frontend",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
     }
   }
 }
