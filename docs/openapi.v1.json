@@ -1,0 +1,116 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Cinema Ops Backend API",
+    "version": "1.0.0",
+    "description": "API REST para operacoes de cinema (autenticacao, sessoes, estoque, precificacao, analytics)."
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "API v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "paths": {
+    "/health/live": {
+      "get": {
+        "summary": "Liveness"
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "summary": "Readiness"
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Autentica usuario e retorna JWT + CSRF token"
+      }
+    },
+    "/users/me": {
+      "get": {
+        "summary": "Perfil do usuario autenticado",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/sessions": {
+      "get": {
+        "summary": "Lista sessoes",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Cria sessao",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/sessions/{sessionId}/sales": {
+      "post": {
+        "summary": "Registra venda de ingressos",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/inventory/items": {
+      "get": {
+        "summary": "Lista itens de estoque",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Cadastra item de estoque",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/pricing/calculate": {
+      "post": {
+        "summary": "Calcula preco detalhado"
+      }
+    },
+    "/pricing/suggest": {
+      "post": {
+        "summary": "Sugere preco dinamico"
+      }
+    },
+    "/analytics/dashboard": {
+      "get": {
+        "summary": "Dashboard operacional",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  }
+}

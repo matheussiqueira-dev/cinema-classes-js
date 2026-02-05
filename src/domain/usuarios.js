@@ -145,6 +145,10 @@ class Usuario {
     return this.isAdmin() || this._permissoes.has(permissaoValida);
   }
 
+  listarPermissoes() {
+    return Array.from(this._permissoes);
+  }
+
   consultarSeguranca() {
     return {
       tentativasFalhas: this._tentativasFalhas,

@@ -1,144 +1,98 @@
-# Cinema Ops Studio Frontend
+# Cinema Ops Backend
 
-Interface frontend moderna para operação de cinema, com foco em:
-- precificação inteligente de ingressos;
-- gestão de sessão com meta de receita e previsibilidade de lotação;
-- controle de estoque com monitoramento de risco;
-- sincronização de horários BR/US e relógios globais.
+Backend modular para operação de cinema, com API REST versionada, autenticação JWT, autorização por papéis/permissões, proteção CSRF para operações mutáveis, validação de dados, logging estruturado e testes automatizados.
 
-## Visão Geral do Frontend
+## Visão Geral do Backend
 
-O frontend foi refatorado para um modelo modular e escalável, com design system orientado por tokens visuais e componentes reutilizáveis.  
-O objetivo principal é oferecer uma experiência de uso clara, rápida e confiável para operação diária.
+O projeto implementa regras de negócio para:
+- venda de ingressos e gestão de sessões;
+- controle de estoque da bomboniere;
+- precificação dinâmica e simulações;
+- cálculo de folha salarial;
+- indicadores operacionais e métricas de sistema.
 
-### Público-alvo
+A solução foi evoluída para um **modular monolith** com separação de camadas e responsabilidades, mantendo o domínio independente e reutilizável.
 
-- Times de operação e atendimento de cinema
-- Gestão comercial e financeira
-- Equipes de produto que precisam simular cenários rapidamente
+## Arquitetura Adotada
 
-### Fluxos principais
+### Estilo
 
-1. Simular preço e salvar cenários de comparação em `Pricing Lab`
-2. Criar sessão, registrar vendas e acompanhar meta em `Session Command`
-3. Cadastrar itens, aplicar movimentos e monitorar críticos em `Stock Board`
-4. Sincronizar relógios e validar horários globais em `Time Sync`
+- **Monólito modular** com camadas de domínio, serviços, middlewares e rotas.
 
-## Stack e Tecnologias Utilizadas
+### Camadas
 
-- HTML5 semântico
-- CSS3 com Design Tokens (Custom Properties)
-- JavaScript ES Modules (arquitetura modular em `ui/js`)
-- Persistência local com `localStorage`
-- Testes de domínio com Jest (Node.js)
-- Servidor estático para UI via `serve`
+- `src/domain`: regras de negócio puras (entidades e lógica central)
+- `src/backend/services`: orquestração de casos de uso
+- `src/backend/repositories`: persistência in-memory e bootstrap de dados
+- `src/backend/routes`: contratos HTTP versionados (`/api/v1`)
+- `src/backend/middlewares`: segurança, autenticação, autorização, observabilidade e erro
+- `src/backend/core`: erros padronizados, logger e helpers HTTP
 
-## Análise e Melhorias Frontend Implementadas
+### Princípios aplicados
 
-### Arquitetura
+- SOLID (responsabilidade única e separação por casos de uso)
+- DRY (reuso de validações e serviços)
+- Clean Architecture (domínio isolado de transporte HTTP)
+- Fail fast + tratamento de exceções orientado a contrato
 
-- Quebra do frontend monolítico em módulos:
-  - `core`: utilitários, formatação, storage, toast, file transfer
-  - `state`: store central da aplicação
-  - `domain`: motor de precificação frontend
-  - `features`: módulos por contexto de tela
-- Redução de acoplamento entre lógica de negócio e manipulação de DOM.
-- Organização preparada para crescimento de features sem degradar manutenção.
+## Tecnologias Utilizadas
 
-### Performance e Renderização
+- Node.js
+- Express 5
+- JWT (`jsonwebtoken`)
+- `helmet`, `cors`, `compression`, `express-rate-limit`
+- Jest + Supertest (testes de unidade e integração)
 
-- Renderização incremental com `DocumentFragment` em listas/tabelas.
-- Persistência com debounce para reduzir escrita excessiva em `localStorage`.
-- Atualizações centralizadas por `store.subscribe`, evitando recomputações dispersas.
-- Separação por views (tabs), reduzindo complexidade perceptiva por contexto.
+## Segurança e Confiabilidade
 
-### Acessibilidade (WCAG-oriented)
+Implementado no backend:
 
-- `skip-link` para navegação por teclado.
-- Navegação por tabs com `role="tablist"`, `role="tab"` e setas `←/→`.
-- Landmarks semânticos (`main`, `aside`, `nav`, `header`, `section`).
-- Estados live (`aria-live`) para feedback de atualização.
-- Focus visible consistente em controles interativos.
-- Respeito a `prefers-reduced-motion`.
+- **Autenticação**: login com JWT (`Bearer`)
+- **Autorização**: RBAC + permissões por cargo
+- **CSRF**: token CSRF obrigatório para `POST/PUT/PATCH/DELETE` autenticados
+- **Validação de entrada**: validações numéricas, texto, e-mail e limites
+- **Sanitização anti-XSS**: sanitização de payload textual antes de processamento
+- **Rate limiting**: proteção contra abuso de requisições
+- **Hardening HTTP**: headers de segurança via `helmet`
+- **Error handling padronizado**: respostas de erro consistentes com `code`, `message`, `requestId`
+- **Observabilidade**: logging estruturado por request (`requestId`, status, latência, usuário)
 
-### SEO e Metadados
+Observação: como a persistência atual é in-memory, risco de SQL Injection é mitigado por ausência de queries SQL. Em evolução para banco, o padrão recomendado é prepared statements/query builders.
 
-- `meta description`
-- Open Graph básico (`og:title`, `og:description`, `og:type`)
-- Hierarquia semântica de títulos e conteúdo principal
+## API REST e Contratos
 
-### UI/UX (Refactor completo)
+Prefixo versionado:
 
-- Novo layout em formato “control center” com side rail + workspace.
-- Hierarquia visual reforçada por:
-  - tokens de tipografia
-  - cartões de informação (KPIs, resultados, timelines)
-  - separação clara entre ações e leitura de status
-- Design system aplicado:
-  - tokens de cor, tipografia, espaçamento, raio e sombra
-  - botões (`btn-primary`, `btn-ghost`, `btn-danger`)
-  - componentes reutilizáveis (`panel`, `result-card`, `kpi-card`, `tag`, `timeline`)
+- `/api/v1`
 
-## Novas Features Implementadas
+### Públicos
 
-1. Persistência automática de estado
-- Salva automaticamente cenário da operação no navegador.
-- Benefício: continuidade entre sessões sem perda de contexto.
+- `GET /api/v1/health/live`
+- `GET /api/v1/health/ready`
+- `GET /api/v1/docs`
+- `GET /api/v1/docs/openapi`
+- `POST /api/v1/auth/login`
+- `POST /api/v1/pricing/calculate`
+- `POST /api/v1/pricing/suggest`
+- `POST /api/v1/pricing/grid`
 
-2. Snapshot JSON (export/import)
-- Exporta estado completo da operação em arquivo JSON.
-- Importa snapshot para restaurar ambiente.
-- Benefício: backup, migração de ambiente e recuperação rápida.
+### Autenticados
 
-3. Gestão de meta de receita
-- Meta configurável com barra de progresso e indicador percentual.
-- Benefício: acompanhamento visual de performance em tempo real.
-
-4. Histórico de cenários de precificação
-- Salva até 8 cenários com reaplicação e remoção individual.
-- Benefício: comparação rápida para decisão comercial.
-
-5. Undo de operação crítica
-- Desfazer última venda de sessão.
-- Desfazer último movimento de estoque.
-- Benefício: redução de erro operacional sem retrabalho manual.
-
-6. Relógios globais em tempo real
-- Exibição simultânea de horários em cidades estratégicas.
-- Benefício: apoio a times distribuídos e coordenação operacional.
-
-## Estrutura do Projeto
-
-```text
-.
-├── ui/
-│   ├── index.html
-│   ├── styles.css
-│   ├── app.js
-│   └── js/
-│       ├── core/
-│       │   ├── fileTransfer.js
-│       │   ├── format.js
-│       │   ├── helpers.js
-│       │   ├── storage.js
-│       │   └── toast.js
-│       ├── domain/
-│       │   └── pricingEngine.js
-│       ├── features/
-│       │   ├── clockView.js
-│       │   ├── dashboard.js
-│       │   ├── navigation.js
-│       │   ├── pricingView.js
-│       │   ├── sessionView.js
-│       │   ├── stockView.js
-│       │   └── workspaceActions.js
-│       └── state/
-│           └── store.js
-├── src/
-│   └── domain/...
-├── __tests__/
-└── package.json
-```
+- `GET /api/v1/users/me`
+- `GET /api/v1/users` (gerente)
+- `GET /api/v1/sessions`
+- `POST /api/v1/sessions` (gerente)
+- `GET /api/v1/sessions/:sessionId`
+- `POST /api/v1/sessions/:sessionId/sales` (permissão `vendas:realizar`)
+- `DELETE /api/v1/sessions/:sessionId/sales/:saleId` (gerente)
+- `GET /api/v1/inventory/items`
+- `GET /api/v1/inventory/items/critical`
+- `POST /api/v1/inventory/items` (gerente/atendente)
+- `PATCH /api/v1/inventory/items/:sku/movement` (gerente/atendente)
+- `POST /api/v1/payroll/employee` (gerente)
+- `POST /api/v1/payroll/team` (gerente)
+- `GET /api/v1/analytics/dashboard` (gerente)
+- `GET /api/v1/analytics/system` (gerente)
 
 ## Setup e Execução
 
@@ -153,44 +107,113 @@ O objetivo principal é oferecer uma experiência de uso clara, rápida e confi�
 npm install
 ```
 
-### Rodar testes
+### Executar API
+
+```bash
+npm run api
+```
+
+API disponível em:
+
+- `http://localhost:3333/api/v1`
+
+### Executar testes
 
 ```bash
 npm test
 ```
 
-### Rodar frontend (servidor estático)
-
-```bash
-npm run ui
-```
-
-Depois acesse `http://localhost:4173`.
-
-### Rodar demonstração Node (domínio)
+### Demo de domínio (opcional)
 
 ```bash
 npm run demo
 ```
 
-## Boas Práticas Adotadas
+### UI estática (opcional)
 
-- Modularização por responsabilidade
-- Estado centralizado com operações explícitas
-- Persistência resiliente com fallback seguro
-- Reutilização de lógica de domínio no frontend
-- Feedback contínuo ao usuário (toast + indicadores)
-- Responsividade mobile/desktop
-- Acessibilidade e navegação por teclado como padrão
+```bash
+npm run ui
+```
+
+## Estrutura do Projeto
+
+```text
+.
+├── src/
+│   ├── core/
+│   │   └── validators.js
+│   ├── domain/
+│   │   ├── ingressos.js
+│   │   ├── usuarios.js
+│   │   ├── relogios.js
+│   │   ├── sessoes.js
+│   │   ├── estoque.js
+│   │   ├── precificacao.js
+│   │   ├── salarios.js
+│   │   └── desempenho.js
+│   └── backend/
+│       ├── app.js
+│       ├── server.js
+│       ├── createContainer.js
+│       ├── config/
+│       │   └── env.js
+│       ├── core/
+│       │   ├── errors.js
+│       │   ├── http.js
+│       │   └── logger.js
+│       ├── middlewares/
+│       │   ├── auth.js
+│       │   ├── errorHandler.js
+│       │   ├── requestContext.js
+│       │   └── security.js
+│       ├── repositories/
+│       │   └── inMemoryDatabase.js
+│       ├── routes/
+│       │   └── v1/
+│       │       ├── index.js
+│       │       ├── authRoutes.js
+│       │       ├── healthRoutes.js
+│       │       ├── usersRoutes.js
+│       │       ├── sessionsRoutes.js
+│       │       ├── inventoryRoutes.js
+│       │       ├── pricingRoutes.js
+│       │       ├── payrollRoutes.js
+│       │       ├── analyticsRoutes.js
+│       │       └── docsRoutes.js
+│       ├── services/
+│       │   ├── authService.js
+│       │   ├── sessionService.js
+│       │   ├── inventoryService.js
+│       │   ├── pricingService.js
+│       │   ├── payrollService.js
+│       │   └── analyticsService.js
+│       └── utils/
+│           └── sanitize.js
+├── docs/
+│   └── openapi.v1.json
+├── __tests__/
+│   ├── api.test.js
+│   └── ...
+└── package.json
+```
+
+## Boas Práticas e Padrões
+
+- Contratos HTTP estáveis com versionamento (`v1`)
+- Erros de domínio mapeados para HTTP de forma consistente
+- Segurança por camadas (auth, autorização, CSRF, limites, sanitização)
+- Estado de aplicação centralizado no container (injeção explícita de dependências)
+- Serviços focados por contexto de negócio
+- Cobertura de integração da API via Supertest
 
 ## Melhorias Futuras
 
-- Migrar para TypeScript no frontend
-- Testes automatizados de UI (Playwright/Cypress)
-- Internacionalização (i18n) para múltiplos idiomas
-- Tema de alto contraste configurável pelo usuário
-- Integração com backend real (API REST/GraphQL)
-- Observabilidade de UX (métricas de interação e funil)
+- Persistência real (PostgreSQL/MongoDB) com migrations
+- Refresh token + rotação e revogação de sessões
+- Observabilidade avançada (OpenTelemetry, métricas Prometheus, tracing)
+- Versionamento semântico de contrato OpenAPI com validação automática
+- Filas assíncronas para eventos operacionais (vendas, auditoria, estoque)
+- Cache distribuído (Redis) para leitura de dashboards
 
 ## Licença
 

@@ -19,10 +19,22 @@
   "scripts": {
     "test": "jest --config=jest.config.cjs",
     "demo": "node index.js",
-    "ui": "serve ui -l 4173"
+    "ui": "serve ui -l 4173",
+    "api": "node src/backend/server.js",
+    "start": "node src/backend/server.js"
+  },
+  "dependencies": {
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "jest": "^29.6.1",
-    "serve": "^14.2.5"
+    "serve": "^14.2.5",
+    "superagent": "^10.3.0",
+    "supertest": "^7.1.4"
   }
 }
