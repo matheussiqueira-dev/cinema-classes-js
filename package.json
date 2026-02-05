@@ -1,15 +1,25 @@
 {
   "name": "js-revisao",
   "version": "1.0.0",
-  "description": "Revisão de classes: ingressos, usuários, relógios",
+  "description": "Plataforma de domínio para operações de cinema com classes, serviços e UI de gestão",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/<SEU_USUARIO>/cinema-classes-js.git"
+    "url": "git+https://github.com/matheussiqueira-dev/cinema-classes-js.git"
   },
   "license": "MIT",
+  "keywords": [
+    "cinema",
+    "javascript",
+    "oop",
+    "pricing",
+    "inventory",
+    "sessions"
+  ],
   "scripts": {
-    "test": "jest --config=jest.config.cjs"
+    "test": "jest --config=jest.config.cjs",
+    "demo": "node index.js",
+    "ui": "npx serve ui -l 4173"
   },
   "devDependencies": {
     "jest": "^29.6.1"

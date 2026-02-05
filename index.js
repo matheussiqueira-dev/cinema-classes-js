@@ -1,49 +1,114 @@
-// Demo de uso das classes criadas
-
-const { Ingresso, MeiaEntrada, IngressoFamilia } = require('./ingressos');
-const { Gerente, Vendedor, Atendente } = require('./usuarios');
-const { Relogio, RelogioAmericano, RelogioBrasileiro } = require('./relogios');
+const { Ingresso, MeiaEntrada, IngressoFamilia, CalculadoraPrecoIngresso } = require('./ingressos');
+const { Atendente, Gerente, Vendedor } = require('./usuarios');
+const { RelogioAmericano, RelogioBrasileiro } = require('./relogios');
+const { SessaoCinema } = require('./sessoes');
+const { ControleDeEstoque } = require('./controledeestoque');
+const { GeradorPrecoIngresso } = require('./precodoingreco');
+const { BaseSalarialCinema } = require('./basesalarial');
+const { PainelDesempenho } = require('./desempenhodaturma');
 
 console.log('=== DEMO INGRESSOS ===');
 const ingressoNormal = new Ingresso(20, 'Matrix', false);
 const meia = new MeiaEntrada(20, 'Toy Story', true);
-const familia = new IngressoFamilia(15, 'Sessão Família', false, 4);
+const familia = new IngressoFamilia(15, 'Sessao Familia', false, 4);
 
 console.log('Ingresso normal:', ingressoNormal.nomeFilme, ingressoNormal.valorReal());
 console.log('Meia entrada:', meia.nomeFilme, meia.valorReal());
-console.log('Ingresso família (4 pessoas, 5% desconto):', familia.valorReal());
+console.log('Ingresso familia (4 pessoas, 5% desconto):', familia.valorReal());
 
-console.log('\n=== DEMO USUÁRIOS ===');
-const g = new Gerente('Alice', 'alice@cinema.com', 'senha123');
-const v = new Vendedor('Bruno', 'bruno@cinema.com', 'vpass');
-const a = new Atendente('Carla', 'carla@cinema.com', 'apass', 100);
+const detalhamento = CalculadoraPrecoIngresso.calcularDetalhado(30, {
+  tipoSala: 'imax',
+  assentoPremium: true,
+  diaDaSemana: 'domingo',
+  cupomPercentual: 10,
+  fidelidade: 'silver',
+});
+console.log('Preco detalhado IMAX:', detalhamento);
 
-console.log('Gerente é admin?', g.isAdmin());
-console.log('Vendedor é admin?', v.isAdmin());
-console.log('Atendente é admin?', a.isAdmin());
+console.log('\n=== DEMO USUARIOS ===');
+const gerente = new Gerente('Alice', 'alice@cinema.com', 'senha123');
+const vendedor = new Vendedor('Bruno', 'bruno@cinema.com', 'vpass');
+const atendente = new Atendente('Carla', 'carla@cinema.com', 'apass', 100);
 
-v.realizarVenda();
-v.realizarVenda();
-console.log('Vendas do vendedor:', v.consultarVendas());
+console.log('Gerente e admin?', gerente.isAdmin());
+console.log('Vendedor e admin?', vendedor.isAdmin());
+console.log('Atendente e admin?', atendente.isAdmin());
 
-a.receberPagamentos(50);
-console.log('Atendente caixa após pagamento:', a.valorEmCaixa);
-console.log('Fechar caixa retorna:', a.fecharCaixa());
-console.log('Caixa depois de fechado:', a.valorEmCaixa);
+vendedor.realizarVenda(90);
+vendedor.realizarVenda(60);
+console.log('Vendas do vendedor (detalhado):', vendedor.consultarVendas(true));
 
-console.log('\n=== DEMO RELÓGIOS ===');
-const rb = new RelogioBrasileiro(21, 30, 15); // 21:30:15
-const ra = new RelogioAmericano(9, 0, 0); // 9:00:00
+atendente.receberPagamentos(50);
+console.log('Atendente caixa apos pagamento:', atendente.valorEmCaixa);
+console.log('Fechar caixa retorna:', atendente.fecharCaixa());
+console.log('Caixa depois de fechado:', atendente.valorEmCaixa);
 
-console.log('Brasileiro:', rb.horaFormatada());
-console.log('Americano:', ra.horaFormatada());
+console.log('\n=== DEMO RELOGIOS ===');
+const relogioBr = new RelogioBrasileiro(21, 30, 15);
+const relogioUs = new RelogioAmericano(9, 0, 0);
 
-// sincronizar americano com brasileiro (21 -> 9pm convertido para 9)
-ra.sincronizarCom(rb);
-console.log('Americano após sincronizar com BR (deve mostrar 09:mm:ss):', ra.horaFormatada());
+console.log('Brasileiro:', relogioBr.horaFormatada());
+console.log('Americano:', relogioUs.horaFormatadaCompleta());
+relogioUs.sincronizarCom(relogioBr);
+console.log('Americano apos sincronizar com BR:', relogioUs.horaFormatadaCompleta());
+relogioBr.sincronizarCom(relogioUs);
+console.log('Brasileiro apos sincronizar com AM:', relogioBr.horaFormatada());
 
-// sincronizar brasileiro com americano (usa hora 1-12 do americano)
-rb.sincronizarCom(ra); // rb receberá hora 9, mantendo formato 0-23 (9)
-console.log('Brasileiro após sincronizar com AM:', rb.horaFormatada());
+console.log('\n=== NOVA FEATURE: SESSAO ===');
+const sessao = new SessaoCinema({
+  id: 'SESSAO-N1',
+  filme: 'Interestelar',
+  sala: 'Sala Prime',
+  horario: '20:30',
+  capacidade: 80,
+  precoBase: 28,
+  dublado: false,
+});
 
-console.log('\nDemo finalizado.');
+const venda1 = sessao.venderIngressos({ tipo: 'inteira', quantidade: 2, opcoesPreco: { tipoSala: 'vip' } });
+const venda2 = sessao.venderIngressos({ tipo: 'familia', quantidade: 1, numeroPessoas: 4 });
+console.log('Venda 1:', venda1);
+console.log('Venda 2:', venda2);
+console.log('Resumo da sessao:', sessao.resumoFinanceiro());
+
+console.log('\n=== NOVA FEATURE: ESTOQUE ===');
+const estoque = new ControleDeEstoque();
+estoque.cadastrarItem({
+  sku: 'PIP-G',
+  nome: 'Pipoca Grande',
+  quantidadeAtual: 40,
+  estoqueMinimo: 10,
+  custoUnitario: 6,
+  precoVenda: 18,
+});
+estoque.registrarSaida('PIP-G', 8);
+console.log('Itens cadastrados:', estoque.listarItens());
+console.log('Itens criticos:', estoque.listarItensAbaixoDoMinimo());
+
+console.log('\n=== NOVA FEATURE: PRECIFICACAO DINAMICA ===');
+const precoSugerido = GeradorPrecoIngresso.sugerirPreco({
+  precoBase: 24,
+  ocupacaoPercentual: 88,
+  antecedenciaDias: 1,
+  diaDaSemana: 'sabado',
+  tipoSala: 'imax',
+});
+console.log('Sugestao de preco:', precoSugerido);
+
+console.log('\n=== NOVA FEATURE: FOLHA SALARIAL ===');
+const folha = new BaseSalarialCinema().calcularFolhaEquipe([
+  { cargo: 'gerente', bonus: 700 },
+  { cargo: 'vendedor', vendas: 12000, taxaComissao: 0.03, horasExtras: 5, valorHoraExtra: 50 },
+  { cargo: 'atendente', horasExtras: 8, valorHoraExtra: 35 },
+]);
+console.log('Resumo folha:', folha);
+
+console.log('\n=== PAINEL DE DESEMPENHO ===');
+const indicadores = PainelDesempenho.gerarIndicadores({
+  sessoes: [sessao],
+  vendedores: [vendedor],
+  itensEstoqueCriticos: estoque.listarItensAbaixoDoMinimo().length,
+});
+console.log('Indicadores:', indicadores);
+
+console.log('\nDemo finalizada.');

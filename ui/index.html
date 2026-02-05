@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cinema Ops Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=Sora:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="ambient-shape shape-a" aria-hidden="true"></div>
+    <div class="ambient-shape shape-b" aria-hidden="true"></div>
+    <div class="ambient-shape shape-c" aria-hidden="true"></div>
+
+    <header class="hero container reveal">
+      <p class="eyebrow">Cinema Operations Platform</p>
+      <h1>Cinema Ops Studio</h1>
+      <p class="hero-description">
+        Gestão operacional com precificação inteligente, sessão em tempo real, controle de estoque e
+        sincronização de relógios em uma experiência visual única.
+      </p>
+      <div class="hero-metrics">
+        <article>
+          <h2 id="metric-occupancy">0%</h2>
+          <p>Ocupação da Sessão Atual</p>
+        </article>
+        <article>
+          <h2 id="metric-revenue">R$ 0,00</h2>
+          <p>Receita Acumulada</p>
+        </article>
+        <article>
+          <h2 id="metric-stock">0</h2>
+          <p>Itens em Estoque Crítico</p>
+        </article>
+      </div>
+    </header>
+
+    <main class="container grid-layout">
+      <section class="card reveal" id="pricing-card">
+        <header class="section-head">
+          <h2>Simulador de Precificação</h2>
+          <p>Monte um cenário comercial e valide o preço recomendado com transparência.</p>
+        </header>
+
+        <form id="price-form" class="form-grid" novalidate>
+          <label>
+            Preço base (R$)
+            <input type="number" min="0" step="0.01" id="price-base" value="28" required />
+          </label>
+          <label>
+            Tipo de ingresso
+            <select id="price-ticket-type">
+              <option value="inteira">Inteira</option>
+              <option value="meia">Meia-entrada</option>
+              <option value="familia">Família</option>
+            </select>
+          </label>
+          <label>
+            Pessoas por ingresso família
+            <input type="number" min="1" step="1" id="price-family-size" value="4" />
+          </label>
+          <label>
+            Quantidade
+            <input type="number" min="1" step="1" id="price-quantity" value="1" required />
+          </label>
+          <label>
+            Tipo de sala
+            <select id="price-room">
+              <option value="padrao">Padrão</option>
+              <option value="vip">VIP</option>
+              <option value="imax">IMAX</option>
+            </select>
+          </label>
+          <label>
+            Dia da semana
+            <select id="price-day">
+              <option value="segunda">Segunda</option>
+              <option value="terca">Terça</option>
+              <option value="quarta">Quarta</option>
+              <option value="quinta">Quinta</option>
+              <option value="sexta">Sexta</option>
+              <option value="sabado">Sábado</option>
+              <option value="domingo">Domingo</option>
+            </select>
+          </label>
+          <label>
+            Ocupação da sessão (%)
+            <input type="number" min="0" max="100" step="1" id="price-occupancy" value="68" />
+          </label>
+          <label>
+            Fidelidade
+            <select id="price-loyalty">
+              <option value="nenhum">Sem fidelidade</option>
+              <option value="silver">Silver</option>
+              <option value="gold">Gold</option>
+            </select>
+          </label>
+          <label>
+            Cupom (%)
+            <input type="number" min="0" max="80" step="1" id="price-coupon" value="0" />
+          </label>
+          <label class="checkbox-field">
+            <input type="checkbox" id="price-dubbed" />
+            Sessão dublada
+          </label>
+          <button class="btn btn-primary" type="submit">Calcular preço</button>
+        </form>
+
+        <article id="price-output" class="result-box" aria-live="polite">
+          <h3>Total recomendado</h3>
+          <p class="result-value">R$ 0,00</p>
+          <ul id="price-breakdown" class="result-list"></ul>
+        </article>
+      </section>
+
+      <section class="card reveal" id="session-card">
+        <header class="section-head">
+          <h2>Gestão de Sessão</h2>
+          <p>Crie uma sessão e acompanhe vendas, lotação e receita em tempo real.</p>
+        </header>
+
+        <form id="session-create-form" class="form-grid" novalidate>
+          <label>
+            Filme
+            <input type="text" id="session-movie" value="Interestelar" required />
+          </label>
+          <label>
+            Sala
+            <input type="text" id="session-room" value="Sala Prime" required />
+          </label>
+          <label>
+            Capacidade
+            <input type="number" min="1" step="1" id="session-capacity" value="80" required />
+          </label>
+          <label>
+            Preço base (R$)
+            <input type="number" min="0" step="0.01" id="session-base-price" value="28" required />
+          </label>
+          <label class="checkbox-field">
+            <input type="checkbox" id="session-dubbed" />
+            Sessão dublada
+          </label>
+          <button class="btn btn-secondary" type="submit">Criar sessão</button>
+        </form>
+
+        <form id="session-sale-form" class="form-grid" novalidate>
+          <label>
+            Tipo
+            <select id="sale-type">
+              <option value="inteira">Inteira</option>
+              <option value="meia">Meia</option>
+              <option value="familia">Família</option>
+            </select>
+          </label>
+          <label>
+            Quantidade de ingressos
+            <input type="number" min="1" step="1" id="sale-quantity" value="1" required />
+          </label>
+          <label>
+            Pessoas por família
+            <input type="number" min="1" step="1" id="sale-family-size" value="4" />
+          </label>
+          <label>
+            Dia da semana
+            <select id="sale-day">
+              <option value="segunda">Segunda</option>
+              <option value="terca">Terça</option>
+              <option value="quarta">Quarta</option>
+              <option value="quinta">Quinta</option>
+              <option value="sexta">Sexta</option>
+              <option value="sabado">Sábado</option>
+              <option value="domingo">Domingo</option>
+            </select>
+          </label>
+          <label>
+            Fidelidade
+            <select id="sale-loyalty">
+              <option value="nenhum">Sem fidelidade</option>
+              <option value="silver">Silver</option>
+              <option value="gold">Gold</option>
+            </select>
+          </label>
+          <button class="btn btn-primary" type="submit">Registrar venda</button>
+        </form>
+
+        <article class="result-box" aria-live="polite">
+          <h3 id="session-title">Nenhuma sessão criada</h3>
+          <div class="meter">
+            <div id="session-meter-bar" class="meter-bar"></div>
+          </div>
+          <p id="session-kpis" class="mono">Lugares disponíveis: -- | Receita: R$ 0,00</p>
+          <ul id="session-sales-log" class="result-list"></ul>
+        </article>
+      </section>
+
+      <section class="card reveal" id="stock-card">
+        <header class="section-head">
+          <h2>Controle de Estoque</h2>
+          <p>Acompanhe reposição, saída e itens críticos da bomboniere.</p>
+        </header>
+
+        <form id="stock-item-form" class="form-grid" novalidate>
+          <label>
+            SKU
+            <input type="text" id="stock-sku" placeholder="PIP-G" required />
+          </label>
+          <label>
+            Nome
+            <input type="text" id="stock-name" placeholder="Pipoca Grande" required />
+          </label>
+          <label>
+            Quantidade inicial
+            <input type="number" min="0" step="1" id="stock-qty" value="20" required />
+          </label>
+          <label>
+            Estoque mínimo
+            <input type="number" min="0" step="1" id="stock-min" value="8" required />
+          </label>
+          <button class="btn btn-secondary" type="submit">Cadastrar item</button>
+        </form>
+
+        <form id="stock-movement-form" class="form-grid" novalidate>
+          <label>
+            SKU
+            <select id="movement-sku"></select>
+          </label>
+          <label>
+            Movimento
+            <select id="movement-type">
+              <option value="entrada">Entrada</option>
+              <option value="saida">Saída</option>
+            </select>
+          </label>
+          <label>
+            Quantidade
+            <input type="number" min="1" step="1" id="movement-qty" value="1" required />
+          </label>
+          <button class="btn btn-primary" type="submit">Aplicar movimento</button>
+        </form>
+
+        <div class="table-wrap" role="region" aria-label="Tabela de estoque">
+          <table>
+            <thead>
+              <tr>
+                <th>SKU</th>
+                <th>Item</th>
+                <th>Saldo</th>
+                <th>Mín.</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="stock-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card reveal" id="clock-card">
+        <header class="section-head">
+          <h2>Sincronização de Relógios</h2>
+          <p>Converta rapidamente entre formato brasileiro (24h) e americano (12h).</p>
+        </header>
+
+        <form id="clock-form" class="form-grid" novalidate>
+          <label>
+            Origem
+            <select id="clock-origin">
+              <option value="br">Brasileiro (24h)</option>
+              <option value="us">Americano (12h)</option>
+            </select>
+          </label>
+          <label>
+            Horário (HH:MM:SS)
+            <input type="text" id="clock-time" value="21:30:15" required />
+          </label>
+          <label>
+            Período (somente origem americana)
+            <select id="clock-period">
+              <option value="AM">AM</option>
+              <option value="PM">PM</option>
+            </select>
+          </label>
+          <button class="btn btn-secondary" type="submit">Sincronizar</button>
+        </form>
+
+        <article class="clock-grid" aria-live="polite">
+          <div class="clock-tile">
+            <h3>Formato BR</h3>
+            <p id="clock-br" class="clock-value">00:00:00</p>
+          </div>
+          <div class="clock-tile">
+            <h3>Formato US</h3>
+            <p id="clock-us" class="clock-value">12:00:00 AM</p>
+          </div>
+          <div class="clock-tile">
+            <h3>Agora</h3>
+            <p id="clock-now" class="clock-value">--:--:--</p>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
