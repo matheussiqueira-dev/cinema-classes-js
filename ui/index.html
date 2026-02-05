@@ -3,308 +3,539 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cinema Ops Studio</title>
+    <title>Cinema Ops Studio | Frontend Control Center</title>
+    <meta
+      name="description"
+      content="Painel frontend para operações de cinema: precificação, sessão, estoque e sincronização de relógios com UX moderna e acessível."
+    />
+    <meta property="og:title" content="Cinema Ops Studio" />
+    <meta
+      property="og:description"
+      content="Gestão operacional de cinema com foco em experiência, performance e consistência visual."
+    />
+    <meta property="og:type" content="website" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=Sora:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div class="ambient-shape shape-a" aria-hidden="true"></div>
-    <div class="ambient-shape shape-b" aria-hidden="true"></div>
-    <div class="ambient-shape shape-c" aria-hidden="true"></div>
+    <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
 
-    <header class="hero container reveal">
-      <p class="eyebrow">Cinema Operations Platform</p>
-      <h1>Cinema Ops Studio</h1>
-      <p class="hero-description">
-        Gestão operacional com precificação inteligente, sessão em tempo real, controle de estoque e
-        sincronização de relógios em uma experiência visual única.
-      </p>
-      <div class="hero-metrics">
-        <article>
-          <h2 id="metric-occupancy">0%</h2>
-          <p>Ocupação da Sessão Atual</p>
-        </article>
-        <article>
-          <h2 id="metric-revenue">R$ 0,00</h2>
-          <p>Receita Acumulada</p>
-        </article>
-        <article>
-          <h2 id="metric-stock">0</h2>
-          <p>Itens em Estoque Crítico</p>
-        </article>
-      </div>
-    </header>
+    <div class="bg-orb bg-orb-a" aria-hidden="true"></div>
+    <div class="bg-orb bg-orb-b" aria-hidden="true"></div>
+    <div class="bg-orb bg-orb-c" aria-hidden="true"></div>
 
-    <main class="container grid-layout">
-      <section class="card reveal" id="pricing-card">
-        <header class="section-head">
-          <h2>Simulador de Precificação</h2>
-          <p>Monte um cenário comercial e valide o preço recomendado com transparência.</p>
-        </header>
-
-        <form id="price-form" class="form-grid" novalidate>
-          <label>
-            Preço base (R$)
-            <input type="number" min="0" step="0.01" id="price-base" value="28" required />
-          </label>
-          <label>
-            Tipo de ingresso
-            <select id="price-ticket-type">
-              <option value="inteira">Inteira</option>
-              <option value="meia">Meia-entrada</option>
-              <option value="familia">Família</option>
-            </select>
-          </label>
-          <label>
-            Pessoas por ingresso família
-            <input type="number" min="1" step="1" id="price-family-size" value="4" />
-          </label>
-          <label>
-            Quantidade
-            <input type="number" min="1" step="1" id="price-quantity" value="1" required />
-          </label>
-          <label>
-            Tipo de sala
-            <select id="price-room">
-              <option value="padrao">Padrão</option>
-              <option value="vip">VIP</option>
-              <option value="imax">IMAX</option>
-            </select>
-          </label>
-          <label>
-            Dia da semana
-            <select id="price-day">
-              <option value="segunda">Segunda</option>
-              <option value="terca">Terça</option>
-              <option value="quarta">Quarta</option>
-              <option value="quinta">Quinta</option>
-              <option value="sexta">Sexta</option>
-              <option value="sabado">Sábado</option>
-              <option value="domingo">Domingo</option>
-            </select>
-          </label>
-          <label>
-            Ocupação da sessão (%)
-            <input type="number" min="0" max="100" step="1" id="price-occupancy" value="68" />
-          </label>
-          <label>
-            Fidelidade
-            <select id="price-loyalty">
-              <option value="nenhum">Sem fidelidade</option>
-              <option value="silver">Silver</option>
-              <option value="gold">Gold</option>
-            </select>
-          </label>
-          <label>
-            Cupom (%)
-            <input type="number" min="0" max="80" step="1" id="price-coupon" value="0" />
-          </label>
-          <label class="checkbox-field">
-            <input type="checkbox" id="price-dubbed" />
-            Sessão dublada
-          </label>
-          <button class="btn btn-primary" type="submit">Calcular preço</button>
-        </form>
-
-        <article id="price-output" class="result-box" aria-live="polite">
-          <h3>Total recomendado</h3>
-          <p class="result-value">R$ 0,00</p>
-          <ul id="price-breakdown" class="result-list"></ul>
-        </article>
-      </section>
-
-      <section class="card reveal" id="session-card">
-        <header class="section-head">
-          <h2>Gestão de Sessão</h2>
-          <p>Crie uma sessão e acompanhe vendas, lotação e receita em tempo real.</p>
-        </header>
-
-        <form id="session-create-form" class="form-grid" novalidate>
-          <label>
-            Filme
-            <input type="text" id="session-movie" value="Interestelar" required />
-          </label>
-          <label>
-            Sala
-            <input type="text" id="session-room" value="Sala Prime" required />
-          </label>
-          <label>
-            Capacidade
-            <input type="number" min="1" step="1" id="session-capacity" value="80" required />
-          </label>
-          <label>
-            Preço base (R$)
-            <input type="number" min="0" step="0.01" id="session-base-price" value="28" required />
-          </label>
-          <label class="checkbox-field">
-            <input type="checkbox" id="session-dubbed" />
-            Sessão dublada
-          </label>
-          <button class="btn btn-secondary" type="submit">Criar sessão</button>
-        </form>
-
-        <form id="session-sale-form" class="form-grid" novalidate>
-          <label>
-            Tipo
-            <select id="sale-type">
-              <option value="inteira">Inteira</option>
-              <option value="meia">Meia</option>
-              <option value="familia">Família</option>
-            </select>
-          </label>
-          <label>
-            Quantidade de ingressos
-            <input type="number" min="1" step="1" id="sale-quantity" value="1" required />
-          </label>
-          <label>
-            Pessoas por família
-            <input type="number" min="1" step="1" id="sale-family-size" value="4" />
-          </label>
-          <label>
-            Dia da semana
-            <select id="sale-day">
-              <option value="segunda">Segunda</option>
-              <option value="terca">Terça</option>
-              <option value="quarta">Quarta</option>
-              <option value="quinta">Quinta</option>
-              <option value="sexta">Sexta</option>
-              <option value="sabado">Sábado</option>
-              <option value="domingo">Domingo</option>
-            </select>
-          </label>
-          <label>
-            Fidelidade
-            <select id="sale-loyalty">
-              <option value="nenhum">Sem fidelidade</option>
-              <option value="silver">Silver</option>
-              <option value="gold">Gold</option>
-            </select>
-          </label>
-          <button class="btn btn-primary" type="submit">Registrar venda</button>
-        </form>
-
-        <article class="result-box" aria-live="polite">
-          <h3 id="session-title">Nenhuma sessão criada</h3>
-          <div class="meter">
-            <div id="session-meter-bar" class="meter-bar"></div>
-          </div>
-          <p id="session-kpis" class="mono">Lugares disponíveis: -- | Receita: R$ 0,00</p>
-          <ul id="session-sales-log" class="result-list"></ul>
-        </article>
-      </section>
-
-      <section class="card reveal" id="stock-card">
-        <header class="section-head">
-          <h2>Controle de Estoque</h2>
-          <p>Acompanhe reposição, saída e itens críticos da bomboniere.</p>
-        </header>
-
-        <form id="stock-item-form" class="form-grid" novalidate>
-          <label>
-            SKU
-            <input type="text" id="stock-sku" placeholder="PIP-G" required />
-          </label>
-          <label>
-            Nome
-            <input type="text" id="stock-name" placeholder="Pipoca Grande" required />
-          </label>
-          <label>
-            Quantidade inicial
-            <input type="number" min="0" step="1" id="stock-qty" value="20" required />
-          </label>
-          <label>
-            Estoque mínimo
-            <input type="number" min="0" step="1" id="stock-min" value="8" required />
-          </label>
-          <button class="btn btn-secondary" type="submit">Cadastrar item</button>
-        </form>
-
-        <form id="stock-movement-form" class="form-grid" novalidate>
-          <label>
-            SKU
-            <select id="movement-sku"></select>
-          </label>
-          <label>
-            Movimento
-            <select id="movement-type">
-              <option value="entrada">Entrada</option>
-              <option value="saida">Saída</option>
-            </select>
-          </label>
-          <label>
-            Quantidade
-            <input type="number" min="1" step="1" id="movement-qty" value="1" required />
-          </label>
-          <button class="btn btn-primary" type="submit">Aplicar movimento</button>
-        </form>
-
-        <div class="table-wrap" role="region" aria-label="Tabela de estoque">
-          <table>
-            <thead>
-              <tr>
-                <th>SKU</th>
-                <th>Item</th>
-                <th>Saldo</th>
-                <th>Mín.</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="stock-table-body"></tbody>
-          </table>
+    <div class="app-shell">
+      <aside class="rail">
+        <div class="brand">
+          <p class="brand-overline">Frontend Operations</p>
+          <h1>Cinema Ops Studio</h1>
+          <p class="brand-copy">
+            Cockpit operacional para times de produto e atendimento com foco em velocidade, clareza e previsibilidade.
+          </p>
         </div>
-      </section>
 
-      <section class="card reveal" id="clock-card">
-        <header class="section-head">
-          <h2>Sincronização de Relógios</h2>
-          <p>Converta rapidamente entre formato brasileiro (24h) e americano (12h).</p>
+        <nav aria-label="Navegação dos módulos">
+          <div class="tab-list" role="tablist" data-nav-list>
+            <button
+              type="button"
+              role="tab"
+              aria-selected="true"
+              aria-controls="view-pricing"
+              id="tab-pricing"
+              data-nav-target="pricing"
+              class="tab-button"
+            >
+              Pricing Lab
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="view-session"
+              id="tab-session"
+              data-nav-target="session"
+              class="tab-button"
+            >
+              Session Command
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="view-stock"
+              id="tab-stock"
+              data-nav-target="stock"
+              class="tab-button"
+            >
+              Stock Board
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="view-clock"
+              id="tab-clock"
+              data-nav-target="clock"
+              class="tab-button"
+            >
+              Time Sync
+            </button>
+          </div>
+        </nav>
+
+        <div class="rail-footer">
+          <p>Atalhos</p>
+          <small><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> Exportar snapshot</small>
+          <small><kbd>←</kbd> / <kbd>→</kbd> Navegar entre módulos</small>
+        </div>
+      </aside>
+
+      <main id="main-content" class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Painel de Operação</p>
+            <h2>Controle Frontend em Tempo Real</h2>
+          </div>
+          <div class="toolbar-actions">
+            <button id="btn-export-workspace" type="button" class="btn btn-ghost">Exportar JSON</button>
+            <button id="btn-import-workspace" type="button" class="btn btn-ghost">Importar JSON</button>
+            <button id="btn-reset-workspace" type="button" class="btn btn-danger">Resetar</button>
+            <input
+              id="input-import-workspace"
+              type="file"
+              accept="application/json"
+              aria-label="Selecionar arquivo JSON para importar"
+              hidden
+            />
+          </div>
         </header>
 
-        <form id="clock-form" class="form-grid" novalidate>
-          <label>
-            Origem
-            <select id="clock-origin">
-              <option value="br">Brasileiro (24h)</option>
-              <option value="us">Americano (12h)</option>
-            </select>
-          </label>
-          <label>
-            Horário (HH:MM:SS)
-            <input type="text" id="clock-time" value="21:30:15" required />
-          </label>
-          <label>
-            Período (somente origem americana)
-            <select id="clock-period">
-              <option value="AM">AM</option>
-              <option value="PM">PM</option>
-            </select>
-          </label>
-          <button class="btn btn-secondary" type="submit">Sincronizar</button>
-        </form>
+        <section class="kpi-grid" aria-label="Indicadores principais">
+          <article class="kpi-card">
+            <p>Ocupação</p>
+            <strong id="kpi-occupancy">0.0%</strong>
+          </article>
+          <article class="kpi-card">
+            <p>Receita</p>
+            <strong id="kpi-revenue">R$ 0,00</strong>
+          </article>
+          <article class="kpi-card">
+            <p>Estoque Crítico</p>
+            <strong id="kpi-stock-critical">0</strong>
+          </article>
+          <article class="kpi-card">
+            <p>Meta Batida</p>
+            <strong id="kpi-goal-progress">--</strong>
+          </article>
+        </section>
 
-        <article class="clock-grid" aria-live="polite">
-          <div class="clock-tile">
-            <h3>Formato BR</h3>
-            <p id="clock-br" class="clock-value">00:00:00</p>
+        <section class="goal-strip" aria-label="Progresso da meta de receita">
+          <div class="goal-track" aria-hidden="true">
+            <div id="goal-progress-bar" class="goal-fill"></div>
           </div>
-          <div class="clock-tile">
-            <h3>Formato US</h3>
-            <p id="clock-us" class="clock-value">12:00:00 AM</p>
-          </div>
-          <div class="clock-tile">
-            <h3>Agora</h3>
-            <p id="clock-now" class="clock-value">--:--:--</p>
-          </div>
-        </article>
-      </section>
-    </main>
+          <p id="goal-progress-hint">Defina uma meta para acompanhar progresso</p>
+          <p id="kpi-last-sync">Ultima sync: sem dados</p>
+        </section>
+
+        <section class="views">
+          <article
+            class="panel"
+            id="view-pricing"
+            data-view="pricing"
+            role="tabpanel"
+            aria-labelledby="tab-pricing"
+          >
+            <header class="panel-head">
+              <h3>Pricing Lab</h3>
+              <p>Simule cenários comerciais, compare estratégias e mantenha histórico de referência.</p>
+            </header>
+
+            <div class="panel-layout">
+              <form id="price-form" class="form-grid" novalidate>
+                <label>
+                  Preço base (R$)
+                  <input id="price-base" name="basePrice" type="number" min="0" step="0.01" value="28" required />
+                </label>
+                <label>
+                  Tipo de ingresso
+                  <select id="price-ticket-type" name="ticketType">
+                    <option value="inteira">Inteira</option>
+                    <option value="meia">Meia</option>
+                    <option value="familia">Família</option>
+                  </select>
+                </label>
+                <label>
+                  Pessoas por ingresso família
+                  <input id="price-family-size" name="familySize" type="number" min="1" step="1" value="4" />
+                </label>
+                <label>
+                  Quantidade
+                  <input id="price-quantity" name="quantity" type="number" min="1" step="1" value="1" />
+                </label>
+                <label>
+                  Tipo de sala
+                  <select id="price-room" name="roomType">
+                    <option value="padrao">Padrão</option>
+                    <option value="vip">VIP</option>
+                    <option value="imax">IMAX</option>
+                  </select>
+                </label>
+                <label>
+                  Dia da semana
+                  <select id="price-day" name="dayOfWeek">
+                    <option value="segunda">Segunda</option>
+                    <option value="terca">Terça</option>
+                    <option value="quarta">Quarta</option>
+                    <option value="quinta">Quinta</option>
+                    <option value="sexta">Sexta</option>
+                    <option value="sabado">Sábado</option>
+                    <option value="domingo">Domingo</option>
+                  </select>
+                </label>
+                <label>
+                  Ocupação (%)
+                  <input id="price-occupancy" name="occupancy" type="number" min="0" max="100" value="68" />
+                </label>
+                <label>
+                  Antecedência da compra (dias)
+                  <input id="price-anticipation" name="anticipationDays" type="number" min="0" max="365" value="7" />
+                </label>
+                <label>
+                  Fidelidade
+                  <select id="price-loyalty" name="loyalty">
+                    <option value="nenhum">Sem fidelidade</option>
+                    <option value="silver">Silver</option>
+                    <option value="gold">Gold</option>
+                  </select>
+                </label>
+                <label>
+                  Cupom (%)
+                  <input id="price-coupon" name="coupon" type="number" min="0" max="80" step="1" value="0" />
+                </label>
+                <label class="toggle-field">
+                  <input id="price-dubbed" name="dubbed" type="checkbox" />
+                  Sessão dublada
+                </label>
+                <button class="btn btn-primary" type="submit">Calcular</button>
+              </form>
+
+              <div class="stack-gap">
+                <section class="result-card" aria-live="polite">
+                  <h4 id="price-output-total">R$ 0,00</h4>
+                  <p id="price-output-unit">Unitário: R$ 0,00</p>
+                  <p id="price-output-delta" data-trend="up">Variação: +0.0%</p>
+                  <ul id="price-breakdown-list" class="list-plain"></ul>
+                </section>
+
+                <section class="result-card">
+                  <h4>Recomendação comercial</h4>
+                  <div id="price-recommendation" class="recommendation-box"></div>
+                </section>
+
+                <section class="result-card">
+                  <header class="card-header-inline">
+                    <h4>Cenários salvos</h4>
+                    <div class="inline-actions">
+                      <button id="price-save-scenario" type="button" class="btn btn-ghost">Salvar cenário</button>
+                      <button id="scenario-clear" type="button" class="btn btn-ghost">Limpar</button>
+                    </div>
+                  </header>
+                  <p id="scenario-empty">Nenhum cenário salvo ainda.</p>
+                  <ul id="scenario-list" class="list-plain"></ul>
+                </section>
+              </div>
+            </div>
+          </article>
+
+          <article
+            class="panel"
+            id="view-session"
+            data-view="session"
+            role="tabpanel"
+            aria-labelledby="tab-session"
+            hidden
+          >
+            <header class="panel-head">
+              <h3>Session Command</h3>
+              <p>Abra sessões, monitore receita, acompanhe lotação e mantenha reversão rápida de vendas.</p>
+            </header>
+
+            <div class="panel-layout">
+              <div class="stack-gap">
+                <form id="session-create-form" class="form-grid" novalidate>
+                  <label>
+                    Filme
+                    <input name="movie" type="text" value="Interestelar" required />
+                  </label>
+                  <label>
+                    Sala
+                    <input name="room" type="text" value="Sala Prime" required />
+                  </label>
+                  <label>
+                    Capacidade
+                    <input name="capacity" type="number" min="1" step="1" value="80" />
+                  </label>
+                  <label>
+                    Preço base (R$)
+                    <input name="basePrice" type="number" min="0" step="0.01" value="28" />
+                  </label>
+                  <label class="toggle-field">
+                    <input name="dubbed" type="checkbox" />
+                    Sessão dublada
+                  </label>
+                  <button class="btn btn-primary" type="submit">Criar sessão</button>
+                </form>
+
+                <form id="session-goal-form" class="form-grid" novalidate>
+                  <label>
+                    Meta de receita (R$)
+                    <input name="revenueGoal" type="number" min="0" step="0.01" value="2000" />
+                  </label>
+                  <button class="btn btn-ghost" type="submit">Atualizar meta</button>
+                </form>
+
+                <form id="session-sale-form" class="form-grid" novalidate>
+                  <label>
+                    Tipo de ingresso
+                    <select name="ticketType">
+                      <option value="inteira">Inteira</option>
+                      <option value="meia">Meia</option>
+                      <option value="familia">Família</option>
+                    </select>
+                  </label>
+                  <label>
+                    Quantidade
+                    <input name="quantity" type="number" min="1" step="1" value="1" />
+                  </label>
+                  <label>
+                    Pessoas por família
+                    <input id="sale-family-size" name="familySize" type="number" min="1" step="1" value="4" />
+                  </label>
+                  <label>
+                    Tipo de sala
+                    <select name="roomType">
+                      <option value="padrao">Padrão</option>
+                      <option value="vip">VIP</option>
+                      <option value="imax">IMAX</option>
+                    </select>
+                  </label>
+                  <label>
+                    Dia da semana
+                    <select name="dayOfWeek">
+                      <option value="segunda">Segunda</option>
+                      <option value="terca">Terça</option>
+                      <option value="quarta">Quarta</option>
+                      <option value="quinta">Quinta</option>
+                      <option value="sexta">Sexta</option>
+                      <option value="sabado">Sábado</option>
+                      <option value="domingo">Domingo</option>
+                    </select>
+                  </label>
+                  <label>
+                    Fidelidade
+                    <select name="loyalty">
+                      <option value="nenhum">Sem fidelidade</option>
+                      <option value="silver">Silver</option>
+                      <option value="gold">Gold</option>
+                    </select>
+                  </label>
+                  <label>
+                    Cupom (%)
+                    <input name="coupon" type="number" min="0" max="80" value="0" />
+                  </label>
+                  <button class="btn btn-primary" type="submit">Registrar venda</button>
+                </form>
+              </div>
+
+              <div class="stack-gap">
+                <section class="result-card" aria-live="polite">
+                  <h4 id="session-title">Nenhuma sessão ativa</h4>
+                  <p id="session-summary">Crie uma sessão para iniciar vendas.</p>
+                  <div class="occupancy-track">
+                    <div id="session-occupancy-bar" class="occupancy-fill"></div>
+                  </div>
+                  <p id="session-occupancy-label">Ocupação: --</p>
+                  <p id="session-forecast">Sem previsão enquanto não houver sessão.</p>
+                  <p id="session-guard">A área de vendas é liberada automaticamente após criar a sessão.</p>
+                </section>
+
+                <section class="result-card">
+                  <header class="card-header-inline">
+                    <h4>Timeline de vendas</h4>
+                    <button id="session-undo-sale" type="button" class="btn btn-ghost">Desfazer última venda</button>
+                  </header>
+                  <p id="session-sales-empty">Nenhuma venda registrada.</p>
+                  <ul id="session-sales-list" class="timeline-list"></ul>
+                </section>
+              </div>
+            </div>
+          </article>
+
+          <article
+            class="panel"
+            id="view-stock"
+            data-view="stock"
+            role="tabpanel"
+            aria-labelledby="tab-stock"
+            hidden
+          >
+            <header class="panel-head">
+              <h3>Stock Board</h3>
+              <p>Gestão de bomboniere com controle de reposição, busca rápida e monitoramento de risco.</p>
+            </header>
+
+            <div class="panel-layout">
+              <div class="stack-gap">
+                <form id="stock-item-form" class="form-grid" novalidate>
+                  <label>
+                    SKU
+                    <input name="sku" type="text" placeholder="PIP-G" required />
+                  </label>
+                  <label>
+                    Nome
+                    <input name="name" type="text" placeholder="Pipoca Grande" required />
+                  </label>
+                  <label>
+                    Quantidade inicial
+                    <input name="qty" type="number" min="0" step="1" value="20" />
+                  </label>
+                  <label>
+                    Estoque mínimo
+                    <input name="min" type="number" min="0" step="1" value="8" />
+                  </label>
+                  <button class="btn btn-primary" type="submit">Salvar item</button>
+                </form>
+
+                <form id="stock-movement-form" class="form-grid" novalidate>
+                  <label>
+                    SKU
+                    <select id="movement-sku" name="sku"></select>
+                  </label>
+                  <label>
+                    Movimento
+                    <select name="movementType">
+                      <option value="entrada">Entrada</option>
+                      <option value="saida">Saída</option>
+                    </select>
+                  </label>
+                  <label>
+                    Quantidade
+                    <input name="qty" type="number" min="1" step="1" value="1" />
+                  </label>
+                  <button class="btn btn-primary" type="submit">Aplicar movimento</button>
+                </form>
+
+                <div class="inline-actions">
+                  <button id="stock-undo-movement" type="button" class="btn btn-ghost">Desfazer último movimento</button>
+                </div>
+              </div>
+
+              <div class="stack-gap">
+                <section class="result-card">
+                  <h4>Itens críticos</h4>
+                  <div id="stock-critical-list" class="tag-list">Nenhum item crítico no momento.</div>
+                </section>
+
+                <section class="result-card">
+                  <header class="card-header-inline">
+                    <h4>Inventário</h4>
+                    <label class="input-inline">
+                      <span>Buscar</span>
+                      <input id="stock-search" type="search" placeholder="SKU ou nome" />
+                    </label>
+                  </header>
+                  <div class="table-scroll" role="region" aria-label="Tabela de estoque">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>SKU</th>
+                          <th>Item</th>
+                          <th>Saldo</th>
+                          <th>Mínimo</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody id="stock-table-body"></tbody>
+                    </table>
+                  </div>
+                  <p id="stock-empty" hidden>Nenhum item encontrado para o filtro informado.</p>
+                </section>
+              </div>
+            </div>
+          </article>
+
+          <article
+            class="panel"
+            id="view-clock"
+            data-view="clock"
+            role="tabpanel"
+            aria-labelledby="tab-clock"
+            hidden
+          >
+            <header class="panel-head">
+              <h3>Time Sync</h3>
+              <p>Sincronize relógios BR/US e compare com cidades globais em tempo real.</p>
+            </header>
+
+            <div class="panel-layout">
+              <div class="stack-gap">
+                <form id="clock-form" class="form-grid" novalidate>
+                  <label>
+                    Origem
+                    <select id="clock-origin" name="origin">
+                      <option value="br">Brasileiro (24h)</option>
+                      <option value="us">Americano (12h)</option>
+                    </select>
+                  </label>
+                  <label>
+                    Horário (HH:MM:SS)
+                    <input id="clock-time" name="time" type="text" value="21:30:15" required />
+                  </label>
+                  <label id="clock-period-group">
+                    Período
+                    <select id="clock-period" name="period">
+                      <option value="AM">AM</option>
+                      <option value="PM">PM</option>
+                    </select>
+                  </label>
+                  <button class="btn btn-primary" type="submit">Sincronizar</button>
+                </form>
+              </div>
+
+              <div class="stack-gap">
+                <section class="result-card clock-card" aria-live="polite">
+                  <div>
+                    <h4>Formato BR</h4>
+                    <p id="clock-br">00:00:00</p>
+                  </div>
+                  <div>
+                    <h4>Formato US</h4>
+                    <p id="clock-us">12:00:00 AM</p>
+                  </div>
+                  <div>
+                    <h4>Agora</h4>
+                    <p id="clock-now">--:--:--</p>
+                  </div>
+                </section>
+
+                <section class="result-card">
+                  <h4>Relógios globais</h4>
+                  <ul id="clock-world-list" class="list-plain"></ul>
+                </section>
+              </div>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
     <script type="module" src="./app.js"></script>
   </body>
 </html>
